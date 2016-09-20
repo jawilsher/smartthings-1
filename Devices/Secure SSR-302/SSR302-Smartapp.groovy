@@ -13,12 +13,13 @@
  *  SSR302 Virtual Thermostat
  *
  *  Author: LimeNinja
+ *  Modifeid by: turbozmr2
  */
  
 definition(
     name: "SSR302 Virtual Thermostat",
-    namespace: "LimeNinja",
-    author: "LimeNinja",
+    namespace: "turbozmr2",
+    author: "turbozmr2",
     description: "Use a seperate temperature/humidity sensor to control the SSR302 Z-Wave Boiler Actuator.",
     category: "Green Living",
     iconUrl: "https://s3.amazonaws.com/smartapp-icons/Meta/temp_thermo-switch.png",
@@ -27,10 +28,13 @@ definition(
 
 preferences {
 	section("Choose a temperature sensor... "){
-		input "sensor", "capability.temperatureMeasurement", title: "Sensor"
+		input "sensor", "capability.temperatureMeasurement", title: "Temperature", required: true
 	}
+    section("Choose a humidity sensor..."){
+    	input "humiditysensor", "capability.relativeHumidityMeasurement", title: "Humidity", required: false
+    }
 	section("Select the SSR302 unit... "){
-		input "outlet", "capability.thermostat", title: "SSR302", multiple: false
+		input "outlet", "capability.thermostat", title: "SSR302", multiple: false, required: true
 	}
 }
 
@@ -38,7 +42,7 @@ def installed()
 {
 	log.debug "Installed"
 	subscribe(sensor, "temperature", temperatureHandler)
-    subscribe(sensor, "humidity", humidityHandler)
+    subscribe(humiditysensor, "humidity", humidityHandler)
 
     // Set setPoint
     if (!atomicState.setPoint) {
@@ -51,7 +55,7 @@ def updated()
 	log.debug "Updated"
 	unsubscribe()
 	subscribe(sensor, "temperature", temperatureHandler)
-    subscribe(sensor, "humidity", humidityHandler)
+    subscribe(humiditysensor, "humidity", humidityHandler)
     
     // Set setPoint
     if (!atomicState.setPoint) {
